@@ -69,9 +69,9 @@ def test_selftest_no_ignore_update(ignore_file, capsys):
     args = [
         "--rcfile=setup.cfg",
         "--score=no",
-        "fixtures/",
+        "fixtures",
         "--ignorefile",
-        "fixtures/pylint-ignore.md",
+        str(pl.Path("fixtures", "pylint-ignore.md")),
     ]
     exitcode = main.main(args)
 
@@ -96,8 +96,8 @@ def test_selftest_ignore_update_noop(ignore_file, capsys):
     args = [
         "--rcfile=setup.cfg",
         "--score=no",
-        "fixtures/",
-        "--ignorefile=fixtures/pylint-ignore.md",
+        "fixtures",
+        f"--ignorefile={pl.Path('fixtures', 'pylint-ignore.md')}",
         "--update-ignorefile",
     ]
     exitcode = main.main(args)

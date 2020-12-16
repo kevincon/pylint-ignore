@@ -304,13 +304,13 @@ def test_load(tmp_ignorefile):
     entries = list(_catalog.values())
 
     assert keys[0].msgid       == "E0102"
-    assert keys[0].path        == "fixtures/fixture_1.py"
+    assert keys[0].path        == str(pl.Path("fixtures", "fixture_1.py"))
     assert keys[0].symbol      == "function-redefined"
     assert keys[0].msg_text    == "function already defined line 1"
     assert keys[0].source_line == "def function_redefined():\n"
 
     assert entries[0].msgid    == "E0102"
-    assert entries[0].path     == "fixtures/fixture_1.py"
+    assert entries[0].path     == str(pl.Path("fixtures", "fixture_1.py"))
     assert entries[0].symbol   == "function-redefined"
     assert entries[0].msg_text == "function already defined line 1"
 

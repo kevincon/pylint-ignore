@@ -3,12 +3,14 @@
 #
 # Copyright (c) 2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
+import os
 import re
 import shutil
 import typing as typ
 import hashlib
 import logging
 import collections
+import posixpath
 
 import pylev
 import pathlib2 as pl
@@ -42,7 +44,7 @@ The recommended approach to using `pylint-ignore` is:
 
 
 ENTRY_TEMPLATE = """
-## File {entry.path} - {lineno_txt}{entry.msgid} ({entry.symbol})
+## File {entry_path} - {lineno_txt}{entry.msgid} ({entry.symbol})
 
 - `message: {msg_text}`
 - `author : {entry.author}`
@@ -304,7 +306,8 @@ def _init_entry_item(entry_vals: EntryValues) -> typ.Tuple[Key, Entry]:
     else:
         old_source_line = ""
 
-    path = entry_vals['path']
+    # Paths stored in the ignorefile use a POSIX representation, so we need to convert that to the host's format
+    path = entry_vals['path'].replace(posixpath.sep, os.sep)
 
     srctxt: MaybeSourceText = None
     if entry_vals['lineno']:
@@ -320,7 +323,7 @@ def _init_entry_item(entry_vals: EntryValues) -> typ.Tuple[Key, Entry]:
 
     ignorefile_entry = Entry(
         entry_vals['msgid'],
-        entry_vals['path'],
+        path,
         entry_vals['symbol'],
         entry_vals['message'],
         msg_extra,
@@ -382,8 +385,13 @@ def dumps_entry(entry: Entry) -> str:
         ctx_src_text = "```\n" + ctx_src_text.rstrip() + "\n```\n\n"
 
     lineno_txt = f"Line {lineno} - " if lineno else ""
+    posix_path = pl.Path(entry.path).as_posix()
     entry_text = ENTRY_TEMPLATE.format(
-        entry=entry, lineno_txt=lineno_txt, msg_text=msg_text, ctx_src_text=ctx_src_text
+        entry=entry,
+        entry_path=posix_path,
+        lineno_txt=lineno_txt,
+        msg_text=msg_text,
+        ctx_src_text=ctx_src_text,
     )
     return entry_text.lstrip("\n")
 
